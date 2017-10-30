@@ -29,4 +29,4 @@ hs_err_pid*
 **/.*
 
 # The configuration, so that you can modify your config file in peace that it won't be uploaded.
-/config.ini
+*.ini
