@@ -3,6 +3,7 @@
 
 # Log file
 *.log
+/log/
 
 # BlueJ files
 *.ctxt
@@ -20,3 +21,12 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/.gradle/
+/bin/
+
+# Any hidden files
+.*
+**/.*
+
+# The configuration, so that you can modify your config file in peace that it won't be uploaded.
+/config.ini
