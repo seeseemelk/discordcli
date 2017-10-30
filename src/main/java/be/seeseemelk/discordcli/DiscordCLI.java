@@ -23,13 +23,29 @@ public class DiscordCLI
 		process = new MainProcess("sh");
 		process.start();
 		
-		discord = new Discord(config.getToken());
+		discord = new Discord(config.getToken(), config.getRole());
 		discord.setTextChannel(config.getTextChannelId());
 		
 		discord.addMessageListener(e ->
 		{
-			String message = e.getMessage().getContent() + "\n";
-			process.write(message);
+			String message = e.getMessage().getContent();
+			if (message.equals("!"))
+			{
+				try
+				{
+					process.stop();
+					process.start();
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+			}
+			else
+			{
+				message += "\n";
+				process.write(message);
+			}
 		});
 		
 		process.addListener(line -> {

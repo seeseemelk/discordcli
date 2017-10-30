@@ -1,11 +1,12 @@
 package be.seeseemelk.discordcli;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -20,6 +21,7 @@ public class MainProcess
 	private OutputStream stdin;
 	private List<Consumer<String>> callbacks = new ArrayList<>();
 	private BlockingQueue<String> lineBuffer = new LinkedBlockingQueue<>();
+	private Thread thread;
 
 	public MainProcess(String processName)
 	{
@@ -40,21 +42,53 @@ public class MainProcess
 			stdout = process.getInputStream();
 			stdin = process.getOutputStream();
 
+			ScheduledThreadPoolExecutor pool = new ScheduledThreadPoolExecutor(1);
+			
 			// Reading thread
 			// Reads lines from the process and pushes it to lineBuffer
 			Runnable runnable = () ->
 			{
-				try (Scanner input = new Scanner(stdout);)
+				try
 				{
-					while (process.isAlive())
+					try (BufferedReader input = new BufferedReader(new InputStreamReader(stdout));)
 					{
-						String line = input.nextLine();
-						
+						while (process.isAlive())
+						{
+							while (!input.ready() && process.isAlive())
+								Thread.sleep(30);
+							
+							if (process.isAlive())
+							{
+								String line = input.readLine();
+								lineBuffer.put(line);
+							}
+						}
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+				}
+				catch (IllegalStateException | InterruptedException e)
+				{
+				}
+				finally
+				{
+					System.out.println("Stopping process");
+					pool.shutdown();
+					
+					if (process.isAlive())
+					{
+						process.destroyForcibly();
+					}
+					else
+					{
+						// Program probably exited unexpectedly.
 						try
 						{
-							lineBuffer.put(line);
+							start();
 						}
-						catch (InterruptedException e)
+						catch (IOException e)
 						{
 							e.printStackTrace();
 						}
@@ -62,7 +96,8 @@ public class MainProcess
 				}
 			};
 			
-			Thread thread = new Thread(runnable);
+			thread = new Thread(runnable);
+			thread.setDaemon(true);
 			thread.start();
 			
 			// Post thread
@@ -84,9 +119,23 @@ public class MainProcess
 				}
 			};
 			
-			ScheduledThreadPoolExecutor pool = new ScheduledThreadPoolExecutor(1);
 			pool.scheduleWithFixedDelay(prunnable, 100L, 100L, TimeUnit.MILLISECONDS);
 		}
+	}
+	
+	public void stop()
+	{
+		thread.interrupt();
+		
+		try
+		{
+			thread.join();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		process = null;
 	}
 
 	/**

@@ -23,11 +23,14 @@ public class Discord
 	private JDA jda;
 	private TextChannel channel;
 	private List<Consumer<GuildMessageReceivedEvent>> callbacks = new ArrayList<>();
+	private String rolename;
 	
-	public Discord(String token)
+	public Discord(String token, String rolename)
 	{
 		try
 		{
+			this.rolename = rolename;
+			
 			jda = new JDABuilder(AccountType.BOT).setToken(token).buildBlocking();
 			AnnotatedEventManager manager = new AnnotatedEventManager();
 			manager.register(this);
@@ -79,7 +82,7 @@ public class Discord
 	{
 		for (Role role : member.getRoles())
 		{
-			if (role.getName().equalsIgnoreCase("operator"))
+			if (role.getName().equalsIgnoreCase(rolename))
 			{
 				return true;
 			}

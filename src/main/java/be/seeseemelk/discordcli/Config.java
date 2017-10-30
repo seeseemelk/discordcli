@@ -10,12 +10,16 @@ public class Config
 {
 	private String token;
 	private String channelId;
+	private String program;
+	private String role;
 	
 	public Config(File file) throws InvalidFileFormatException, IOException
 	{
 		Ini ini = new Ini(file);
 		token = ini.get("Discord", "token");
 		channelId = ini.get("Discord", "channel_id");
+		program = ini.get("Discord", "program");
+		role = ini.get("Discord", "role");
 		
 		if (token == null)
 		{
@@ -43,5 +47,23 @@ public class Config
 	public String getTextChannelId()
 	{
 		return channelId;
+	}
+	
+	/**
+	 * The name of the program to run.
+	 * @return The program to run.
+	 */
+	public String getProgram()
+	{
+		return program;
+	}
+	
+	/**
+	 * The required role to interact with the bot.
+	 * @return The role required to interact with the bot.
+	 */
+	public String getRole()
+	{
+		return role;
 	}
 }

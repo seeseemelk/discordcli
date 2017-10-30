@@ -8,3 +8,10 @@ token = <token>
 # The id of the textchannel that the bot
 # should look at for input and write output to.
 channel_id = <channel_id>
+
+# The program to start.
+program = sh
+
+# The role a user needs in order to post interact with the bot.
+# Note that it is case-insensitive.
+role = operator
