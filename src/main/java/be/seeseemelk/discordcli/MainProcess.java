@@ -108,7 +108,7 @@ public class MainProcess
 					StringBuilder builder = new StringBuilder();
 					
 					int lines = 0;
-					while (!lineBuffer.isEmpty() && lines < 50)
+					while (!lineBuffer.isEmpty() && lines < 10)
 					{
 						String line = lineBuffer.poll();
 						builder.append(line).append('\n');
