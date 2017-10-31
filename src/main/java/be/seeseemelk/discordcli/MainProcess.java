@@ -108,11 +108,21 @@ public class MainProcess
 					StringBuilder builder = new StringBuilder();
 					
 					int lines = 0;
-					while (!lineBuffer.isEmpty() && lines < 10)
+					while (!lineBuffer.isEmpty() && builder.length() < 500)
 					{
-						String line = lineBuffer.poll();
-						builder.append(line).append('\n');
-						lines++;
+						String line = lineBuffer.peek();
+						if (builder.length() + line.length() + 1 < 500)
+						{
+							line = lineBuffer.poll();
+							builder.append(line).append('\n');
+							lines++;
+						}
+					}
+					
+					// Insert an extra newline if the output consists of multiple lines.
+					if (lines > 1)
+					{
+						builder.insert(0, '\n');
 					}
 					
 					receivedLine(builder.toString());
