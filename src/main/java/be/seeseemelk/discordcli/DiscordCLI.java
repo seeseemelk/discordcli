@@ -55,7 +55,7 @@ public class DiscordCLI
 			}
 			else
 			{
-				discord.postMessage(line);
+				discord.postMessage("```" + line + "```");
 			}
 		});
 	}

@@ -107,7 +107,6 @@ public class MainProcess
 				{
 					StringBuilder builder = new StringBuilder();
 					
-					int lines = 0;
 					while (!lineBuffer.isEmpty() && builder.length() < 500)
 					{
 						String line = lineBuffer.peek();
@@ -115,14 +114,7 @@ public class MainProcess
 						{
 							line = lineBuffer.poll();
 							builder.append(line).append('\n');
-							lines++;
 						}
-					}
-					
-					// Insert an extra newline if the output consists of multiple lines.
-					if (lines > 1)
-					{
-						builder.insert(0, '\n');
 					}
 					
 					receivedLine(builder.toString());
